@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@mipmap/splash_page1"
+    android:padding="20dp"
+    >
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/imageView1"
+        android:src="@mipmap/user_login"
+        android:scaleType="fitCenter"
+        app:riv_corner_radius="30dip"
+        app:riv_border_width="1dip"
+        app:riv_border_color="#fff"
+        app:riv_mutate_background="true"
+        app:riv_oval="true"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="30dp"
+        />
+
+    <EditText
+        android:id="@+id/et_username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="用户名"
+        android:textColorHint="#fff"
+        android:background="@drawable/shape_login_page_username"
+        android:padding="15dp"
+        android:drawableLeft="@mipmap/login_username"
+        android:drawablePadding="10dp"
+        android:layout_marginTop="20dp"
+        android:inputType="number"
+        android:maxLength="20"
+        android:maxLines="1"
+        android:textColor="#fff"
+        />
+
+    <EditText
+        android:id="@+id/et_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="密码"
+        android:textColorHint="#fff"
+        android:background="@drawable/shape_login_page_username"
+        android:padding="15dp"
+        android:layout_marginTop="20dp"
+        android:drawableLeft="@mipmap/login_password"
+        android:drawablePadding="10dp"
+        android:inputType="textPassword"
+        android:maxLength="20"
+        android:maxLines="1"
+        android:textColor="#fff"
+        />
+
+    <Button
+        android:id="@+id/btn_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="登 录"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/selector_login_page_btn"
+        android:textColor="#fff"
+        />
+
+    <WebView
+        android:id="@+id/webview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"/>
+
+
+
+
+</LinearLayout>

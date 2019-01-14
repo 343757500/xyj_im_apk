@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#000</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="translucent">#44000000</color>
+
+    <color name="white">#ffffffff</color>
+    <color name="black">#ff000000</color>
+    <color name="red">#ffff0000</color>
+    <color name="green">#ff00ff00</color>
+    <color name="blue">#ff0000ff</color>
+    <color name="gray">#666667</color>
+
+    <color name="item_text_selected">#ffFF304E</color>
+    <color name="item_text_normal">#ff828282</color>
+    <color name="item_bg">#ffF5F5F5</color>
+
+    <color name="item_text_01">#ff393939</color>
+    <color name="item_text_02">#ff8F8F8F</color>
+    <color name="item_text_price">#ffFF304E</color>
+
+    <color name="tab_indicator_selected">#FF2E51</color>
+    <color name="tab_indicator_normal">#00000000</color>
+
+    <color name="activity_bg">#ffF5F5F5</color>
+    <color name="title_bar_bg">#FFFF2D4B</color>
+
+    <color name="title_bar_bg_normal">#FFFF2D4B</color>
+    <color name="title_bar_bg_pressed">#bbFF2D4B</color>
+
+    <color name="title_bar_item_pressed">#2E2D32</color>
+
+    <color name="tab_text_normal">#848A84</color>
+    <color name="tab_text_pressed">#ffFF2D4B</color>
+
+    <color name="list_divider">#339C9A9C</color>
+    <color name="list_item_normal">#ffffffff</color>
+    <color name="list_item_pressed">#ffF2F2F2</color>
+    <color name="list_item_text_01">#434343</color>
+    <color name="list_item_text_02">#9C9A9C</color>
+
+    <color name="shop_category_item_selected">#FF304E</color>
+    <color name="search_bg">#BDBDBD</color>
+    <color name="btn_commit_order">#FF2D4B</color>
+    <color name="btn_green_bg">#22c222</color>
+    <color name="btn_get_sms_code">#3C76FF</color>
+
+    <color name="btn_resend_sms_normal">#fff</color>
+    <color name="btn_resend_sms_pressed">#22000000</color>
+    <color name="btn_resend_sms_enabled">#22000000</color>
+
+    <!--商家背景的几种随机颜色-->
+    <color name="shop_detail_bg_01">#E19133</color>
+    <color name="shop_detail_bg_02">#ED813F</color>
+    <color name="shop_detail_bg_03">#5AAA60</color>
+    <color name="shop_detail_bg_04">#AAAE35</color>
+
+    <!--购物车显示栏背景颜色-->
+    <color name="shop_detail_my_cart_bg">#3A3635</color>
+    <color name="shop_detail_my_cart_text">#A09898</color>
+
+    <!-- flyco tab layout -->
+    <color name="textColorPrimary">#ff333333</color>
+    <color name="background">#f2f4f5</color>
+
+    <color name="shadow_bg">#66000000</color>
+    <color name="side_bar_text">#4A4A4A</color>
+    <color name="edit_bg">#EFEFF4</color>
+    <color name="darker_gray">#9b9b9b</color>
+    <color name="text_gray1">#999</color>
+    <color name="line">#DDDDDD</color>
+    <color name="background_gray1">#EBEBEB</color>
+    <color name="background_gray2">#E6E6E6</color>
+    <color name="background_gray3">#D4D4D4</color>
+    <color name="background_gray4">#EFEFF4</color>
+    <color name="line_btn">#BBBBBB</color>
+    <!--蒙版-->
+    <color name="colorMask">#66000000</color>
+    <color name="panel_black">#25272A</color>
+    <color name="text_blue1">#1173CB</color>
+</resources>
