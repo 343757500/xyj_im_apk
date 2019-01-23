@@ -1,6 +1,7 @@
 package com.xyj.tencent.wechat.ui.holder;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -11,8 +12,11 @@ import com.xyj.tencent.R;
 import com.xyj.tencent.common.ui.BaseAdapterRV;
 import com.xyj.tencent.common.ui.BaseHolderRV;
 import com.xyj.tencent.wechat.model.bean.LoginFriendGroups;
+import com.xyj.tencent.wechat.model.db.DBUtils;
+import com.xyj.tencent.wechat.ui.activity.ConverActivity;
 
 import org.apache.commons.lang3.StringUtils;
+import org.greenrobot.eventbus.EventBus;
 
 public class MainFragment2Holder extends BaseHolderRV<LoginFriendGroups.ResultBean.GroupsBean.FriendsBean> {
 
@@ -44,5 +48,21 @@ public class MainFragment2Holder extends BaseHolderRV<LoginFriendGroups.ResultBe
             tv.setText(bean.getNickname());
         }
 
+    }
+
+    @Override
+    protected void onItemClick(View itemView, int position, LoginFriendGroups.ResultBean.GroupsBean.FriendsBean bean) {
+        super.onItemClick(itemView, position, bean);
+        Intent intent=new Intent(context,ConverActivity.class);
+        intent.putExtra("nickName",bean.getNickname());
+        intent.putExtra("wxid",bean.getWxid());
+       // intent.putExtra("fromAccount",bean.getFromAccount());
+        String fromAccount = DBUtils.selectFbyWxid(bean.getWxid());
+        intent.putExtra("fromAccount",fromAccount);
+        intent.putExtra("fid",bean.getId());
+        intent.putExtra("headUrl",bean.getHeadImgUrl());
+        context.startActivity(intent);
+
+        EventBus.getDefault().postSticky(bean);
     }
 }

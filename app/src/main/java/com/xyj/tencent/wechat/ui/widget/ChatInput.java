@@ -61,29 +61,30 @@ public class ChatInput extends RelativeLayout implements TextWatcher,View.OnClic
     }
 
     private void initView(){
-        textPanel = (LinearLayout) findViewById(R.id.text_panel);
-        btnAdd = (ImageButton) findViewById(R.id.btn_add);
+        textPanel = findViewById(R.id.text_panel);
+        btnAdd = findViewById(R.id.btn_add);
         btnAdd.setOnClickListener(this);
-        btnSend = (ImageButton) findViewById(R.id.btn_send);
+        btnSend = findViewById(R.id.btn_send);
         btnSend.setOnClickListener(this);
-        btnVoice = (ImageButton) findViewById(R.id.btn_voice);
+        btnVoice = findViewById(R.id.btn_voice);
         btnVoice.setOnClickListener(this);
-        btnEmotion = (ImageButton) findViewById(R.id.btnEmoticon);
+        btnEmotion = findViewById(R.id.btnEmoticon);
         btnEmotion.setOnClickListener(this);
-        morePanel = (LinearLayout) findViewById(R.id.morePanel);
-        LinearLayout BtnImage = (LinearLayout) findViewById(R.id.btn_photo);
+        morePanel = findViewById(R.id.morePanel);
+        LinearLayout BtnImage = findViewById(R.id.btn_photo);
         BtnImage.setOnClickListener(this);
-        LinearLayout BtnPhoto = (LinearLayout) findViewById(R.id.btn_image);
+        LinearLayout BtnPhoto = findViewById(R.id.btn_image);
         BtnPhoto.setOnClickListener(this);
-        LinearLayout btnVideo = (LinearLayout) findViewById(R.id.btn_video);
+        LinearLayout btnVideo = findViewById(R.id.btn_video);
         btnVideo.setOnClickListener(this);
-        LinearLayout btnFile = (LinearLayout) findViewById(R.id.btn_file);
+        LinearLayout btnFile = findViewById(R.id.btn_file);
         btnFile.setOnClickListener(this);
         setSendBtn();
-        btnKeyboard = (ImageButton) findViewById(R.id.btn_keyboard);
+        btnKeyboard = findViewById(R.id.btn_keyboard);
         btnKeyboard.setOnClickListener(this);
-        voicePanel = (TextView) findViewById(R.id.voice_panel);
+        voicePanel = findViewById(R.id.voice_panel);
         voicePanel.setOnTouchListener(new OnTouchListener() {
+            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
@@ -99,7 +100,7 @@ public class ChatInput extends RelativeLayout implements TextWatcher,View.OnClic
                 return true;
             }
         });
-        editText = (EditText) findViewById(R.id.input);
+        editText = findViewById(R.id.input);
         editText.addTextChangedListener(this);
         editText.setOnFocusChangeListener(new OnFocusChangeListener() {
             @Override
@@ -110,7 +111,7 @@ public class ChatInput extends RelativeLayout implements TextWatcher,View.OnClic
             }
         });
         isSendVisible = editText.getText().length() != 0;
-        emoticonPanel = (LinearLayout) findViewById(R.id.emoticonPanel);
+        emoticonPanel = findViewById(R.id.emoticonPanel);
 
     }
 

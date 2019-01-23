@@ -112,12 +112,14 @@ public class LoginActivity extends BaseActivity {
         }else if (reqType==IHttpService.TYPE_LOGINTICKET){
            LoginTicket loginTicket= (LoginTicket) msg.obj;
            initTMConfig(this,loginTicket.getResult().getSdkAppId(),loginTicket);
+            SharedPreUtil.saveString(this,"relationId",loginTicket.getResult().getRelationId());
            //loginTencentIM(loginTicket);
         }else if (reqType==IHttpService.TYPE_LOGINFRIENDGROUP){
             LoginFriendGroups loginFriendGroups= (LoginFriendGroups) msg.obj;
             if ("200".equals(loginFriendGroups.getCode())){
 
                 MyApp.setLoginFriendGroups(loginFriendGroups);
+
 
                 Intent intent = new Intent(this,UserSelectActivity.class);
                 startActivity(intent);

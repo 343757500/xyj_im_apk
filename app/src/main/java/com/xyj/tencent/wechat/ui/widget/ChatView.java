@@ -2,6 +2,7 @@ package com.xyj.tencent.wechat.ui.widget;
 
 import com.tencent.imsdk.TIMMessage;
 import com.tencent.imsdk.ext.message.TIMMessageDraft;
+import com.xyj.tencent.wechat.model.bean.SendMsgBean;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public interface ChatView extends MvpView {
      *
      * @param message 返回的消息
      */
-    void onSendMessageSuccess(TIMMessage message);
+    void onSendMessageSuccess(TIMMessage message, SendMsgBean sendMsgBean);
 
     /**
      * 发送消息失败

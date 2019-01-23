@@ -49,7 +49,10 @@ public class MyDbHelper extends SQLiteOpenHelper {
                 "wxid text," +
                 "headUrl text," +
                 "nickName text," +
-                "remarkName text"+")"
+                "remarkName text," +
+                "receiverState text," +
+                "fid text," +
+                "msgState text"+")"
         );
     }
 

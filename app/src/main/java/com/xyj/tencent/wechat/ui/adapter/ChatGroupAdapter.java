@@ -10,15 +10,17 @@ import com.xyj.tencent.wechat.model.bean.LoginFriendGroups;
 import com.xyj.tencent.wechat.ui.holder.ChatGroupHolder;
 import com.xyj.tencent.wechat.ui.holder.UserSelectFriendGroupHolder;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
-public class ChatGroupAdapter extends BaseAdapterRV<ImMessageBean> {
-    public ChatGroupAdapter(Context context, List<ImMessageBean> listData) {
+public class ChatGroupAdapter extends BaseAdapterRV<ArrayList<ImMessageBean>> {
+    public ChatGroupAdapter(Context context, List<ArrayList<ImMessageBean>> listData) {
         super(context, listData);
     }
 
     @Override
-    public BaseHolderRV<ImMessageBean> createViewHolder(Context context, ViewGroup parent, int viewType) {
+    public BaseHolderRV<ArrayList<ImMessageBean>> createViewHolder(Context context, ViewGroup parent, int viewType) {
         return new ChatGroupHolder(context,parent,this,viewType);
     }
 

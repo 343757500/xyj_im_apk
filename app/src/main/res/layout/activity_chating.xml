@@ -36,7 +36,7 @@
 
     </RelativeLayout>
 
-    <com.tencent.qcloud.ui.ChatInput
+    <com.xyj.tencent.wechat.ui.widget.ChatInput
         android:id="@+id/input_panel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -53,7 +53,7 @@
         />
 
 
-    <com.tencent.qcloud.ui.VoiceSendingView
+    <com.xyj.tencent.wechat.ui.widget.VoiceSendingView
         android:id="@+id/voice_sending"
         android:layout_width="130dp"
         android:layout_height="130dp"

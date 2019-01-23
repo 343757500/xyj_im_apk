@@ -37,6 +37,7 @@
     </activity>
         <activity android:name=".wechat.ui.activity.UserSelectActivity"/>
         <activity android:name=".wechat.ui.activity.HomeActivityVersion1"/>
+        <activity android:name=".wechat.ui.activity.ConverActivity"/>
 
 
         <!-- Android 9.0兼容配置 -->

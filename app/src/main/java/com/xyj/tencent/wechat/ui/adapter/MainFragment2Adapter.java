@@ -83,4 +83,6 @@ public class MainFragment2Adapter extends BaseAdapterRV<LoginFriendGroups.Result
         };
     }
 
+
+
 }

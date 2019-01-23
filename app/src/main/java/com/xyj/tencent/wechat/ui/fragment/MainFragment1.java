@@ -32,9 +32,11 @@ import com.xyj.tencent.wechat.ui.adapter.ChatGroupAdapter;
 import com.xyj.tencent.wechat.ui.adapter.UserSelectAdapter;
 import com.xyj.tencent.wechat.ui.adapter.UserSelectFragementAdapter;
 import com.xyj.tencent.wechat.ui.adapter.UserSelectFriendGroupAdapter;
+import com.xyj.tencent.wechat.util.IsReadUtil;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -46,7 +48,8 @@ public class MainFragment1 extends BaseFragment {
     private RecyclerView rv_list;
     private TextView tv_current;
     private ImageView iv_current;
-    private List<ImMessageBean> imMessageBeans=new ArrayList<>();
+    private ArrayList<ImMessageBean> imMessageBeans=new ArrayList<>();
+    //private static List<List<ImMessageBean>> list ;
     private List<String> imMessageName=new ArrayList<>();
     private ChatGroupAdapter chatGroupAdapter;
 
@@ -73,11 +76,7 @@ public class MainFragment1 extends BaseFragment {
     }
 
     private void NewMessageListener() {
-        MyDbHelper myDBHelper = new MyDbHelper(getActivity());
-        SQLiteDatabase writableDatabase = myDBHelper.getWritableDatabase();
         TIMManager.getInstance().addMessageListener(new TIMMessageListener() {
-
-
             @Override
             public boolean onNewMessages(List<TIMMessage> list) {
 
@@ -108,9 +107,6 @@ public class MainFragment1 extends BaseFragment {
                                                 imMessageBeans.remove(k);
                                             }
                                         }
-
-
-                                        //if (!imMessageName.contains(messageBean.getWxid())) {
                                             //从数据库中获取判断
                                             Cursor cursor = MyApp.getDbs().query("im_message", new String[]{"wxid","headUrl","nickName","remarkName","imwechatId"}, null, null, null, null, null, null);
                                             while (cursor.moveToNext()){
@@ -124,11 +120,8 @@ public class MainFragment1 extends BaseFragment {
 
                                             imMessageBeans.add(messageBean);
                                             imMessageName.add(messageBean.getWxid());
-                                            Collections.sort(imMessageBeans);
-                                            chatGroupAdapter = new ChatGroupAdapter(getActivity(), imMessageBeans);
-                                            rv_list.setAdapter(chatGroupAdapter);
-                                            chatGroupAdapter.notifyDataSetChanged();
                                             insertImMessageBean(messageBean);
+                                            initData();
 
                                     }
                                 }
@@ -154,6 +147,14 @@ public class MainFragment1 extends BaseFragment {
         values.put("headUrl",messageBean.getHeadUrl());
         values.put("nickName",messageBean.getNickName());
         values.put("remarkName",messageBean.getRemarkName());
+        values.put("fid",messageBean.getId());
+        values.put("msgState","1");
+        Log.e("is",IsReadUtil.isConverActivity+":"+messageBean.getId()+":"+IsReadUtil.fid);
+        if (IsReadUtil.isConverActivity&&messageBean.getId().equals(IsReadUtil.fid)){
+            values.put("receiverState","0");//(接收状态 0接收成功且已读 1接收失败 2接收成功但是未读)
+        }else {
+            values.put("receiverState","2");
+        }
         MyApp.getDbs().insert("tb_chat",null,values);
     }
 
@@ -164,13 +165,15 @@ public class MainFragment1 extends BaseFragment {
 
     @Override
     public void initData() {
-
+       ArrayList<ArrayList<ImMessageBean>> list=new ArrayList<>();
 
         List<LoginFriendGroups.ResultBean> result = MyApp.getGroupFriendsBean().getResult();
         int selectindex = SharedPreUtil.getInt(getActivity(), "selectindex", -1);
         String headImgUrl = result.get(selectindex).getHeadImgUrl();
         String nickname = result.get(selectindex).getNickname();
         String wechatId = result.get(selectindex).getWechatId();
+
+        SharedPreUtil.saveString(getActivity(),"wechatId",wechatId);
         tv_current.setText(nickname+"  的好友");
         Picasso.with(getActivity()).load(headImgUrl).into(iv_current);
 
@@ -178,12 +181,23 @@ public class MainFragment1 extends BaseFragment {
         imMessageBeans.clear();
         //初始化聊天记录最新一条
         //select * from tb_chat where id in (select Max(id) from tb_chat group by wxno);
-        imMessageBeans = DBUtils.getNewestHistory(imMessageBeans, wechatId);
+        //imMessageBeans = DBUtils.getNewestHistory(imMessageBeans, wechatId);
 
-        Collections.sort(imMessageBeans);
-        chatGroupAdapter = new ChatGroupAdapter(getActivity(), imMessageBeans);
+        int size = MyApp.getGroupFriendsBean().getResult().get(selectindex).getGroups().size();
+        for (int i = 0; i < size; i++) {
+            LoginFriendGroups.ResultBean.GroupsBean groupsBean = MyApp.getGroupFriendsBean().getResult().get(selectindex).getGroups().get(i);
+            List<LoginFriendGroups.ResultBean.GroupsBean.FriendsBean> friends = groupsBean.getFriends();
+            for (int j = 0; j < friends.size(); j++) {
+                ArrayList<ImMessageBean> newHistory = DBUtils.getNewHistory(friends.get(j).getWxid(), wechatId);
+                if (newHistory.size()>0){
+                    list.add(newHistory);
+                }
+            }
+        }
+       // Collections.reverse(list);
+        chatGroupAdapter = new ChatGroupAdapter(getActivity(), list);
         rv_list.setAdapter(chatGroupAdapter);
-        chatGroupAdapter.notifyDataSetChanged();
+       // chatGroupAdapter.notifyDataSetChanged();
 
 
 
@@ -213,5 +227,12 @@ public class MainFragment1 extends BaseFragment {
     @Override
     public void onClick(View v, int id) {
 
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+       initData();
     }
 }

@@ -22,6 +22,19 @@ public class ImMessageBean implements Comparable{
     private String headUrl;
     private String nickName;
     private String remarkName;
+    private String receiverState;
+    private String id;
+
+    public String getMsgState() {
+        return msgState;
+    }
+
+    public void setMsgState(String msgState) {
+        this.msgState = msgState;
+    }
+
+    private String msgState;
+
 
     public String getWxid() {
         return wxid;
@@ -108,5 +121,40 @@ public class ImMessageBean implements Comparable{
     @Override
     public int compareTo(@NonNull Object another) {
        return -1;
+    }
+
+    public String getReceiverState() {
+        return receiverState;
+    }
+
+    public void setReceiverState(String receiverState) {
+        this.receiverState = receiverState;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "ImMessageBean{" +
+                "wxno='" + wxno + '\'' +
+                ", fromAccount='" + fromAccount + '\'' +
+                ", toAccount='" + toAccount + '\'' +
+                ", content='" + content + '\'' +
+                ", conversationTime=" + conversationTime +
+                ", type='" + type + '\'' +
+                ", wxid='" + wxid + '\'' +
+                ", headUrl='" + headUrl + '\'' +
+                ", nickName='" + nickName + '\'' +
+                ", remarkName='" + remarkName + '\'' +
+                ", receiverState='" + receiverState + '\'' +
+                ", id='" + id + '\'' +
+                ", msgState='" + msgState + '\'' +
+                '}';
     }
 }
