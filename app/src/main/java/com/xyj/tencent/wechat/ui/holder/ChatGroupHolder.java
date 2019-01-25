@@ -104,6 +104,7 @@ public class ChatGroupHolder extends BaseHolderRV<ArrayList<ImMessageBean>> {
         Intent intent=new Intent(context,ConverActivity.class);
         intent.putExtra("nickName",imMessageBean.getNickName());
         intent.putExtra("wxid",imMessageBean.getWxid());
+        intent.putExtra("wxno",imMessageBean.getWxno());
         intent.putExtra("fromAccount",imMessageBean.getFromAccount());
         intent.putExtra("fid",imMessageBean.getId());
         intent.putExtra("headUrl",imMessageBean.getHeadUrl());

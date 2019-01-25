@@ -84,5 +84,14 @@ public class MainFragment2Adapter extends BaseAdapterRV<LoginFriendGroups.Result
     }
 
 
+    /**
+     * 提供给Activity刷新数据
+     * @param list
+     */
+    public void updateList(List<LoginFriendGroups.ResultBean.GroupsBean.FriendsBean> list){
+        this.listData = list;
+        notifyDataSetChanged();
+    }
+
 
 }

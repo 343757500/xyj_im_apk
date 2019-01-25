@@ -3,9 +3,12 @@ package com.xyj.tencent.wechat.ui.fragment;
 import android.nfc.Tag;
 import android.os.Message;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.xyj.tencent.R;
@@ -16,12 +19,16 @@ import com.xyj.tencent.wechat.model.protocol.IHttpService;
 import com.xyj.tencent.wechat.presenter.MainFragment2Presenter;
 import com.xyj.tencent.wechat.ui.adapter.MainFragment2Adapter;
 import com.xyj.tencent.wechat.ui.expand.StickyRecyclerHeadersDecoration;
+import com.xyj.tencent.wechat.ui.widget.ClearEditText;
 import com.xyj.tencent.wechat.ui.widget.DividerDecoration;
 import com.xyj.tencent.wechat.ui.widget.SideBar;
 import com.xyj.tencent.wechat.ui.widget.TouchableRecyclerView;
 import com.xyj.tencent.wechat.ui.widget.ZSideBar;
 import com.xyj.tencent.wechat.util.CharacterParser;
 import com.xyj.tencent.wechat.util.PinyinComparator;
+import com.xyj.tencent.wechat.util.PinyinUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,6 +44,7 @@ public class MainFragment2 extends BaseFragment {
     private List<LoginFriendGroups.ResultBean.GroupsBean.FriendsBean> friendsBeans;
     private PinyinComparator pinyinComparator;
     private ZSideBar contact_zsidebar;
+    private ClearEditText clearEditText;
 
     @Override
     public int getLayoutRes() {
@@ -51,6 +59,7 @@ public class MainFragment2 extends BaseFragment {
         rv_contact_member = findView(R.id.contact_member);
         contact_sidebar = findView(R.id.contact_sidebar);
         contact_zsidebar = findView(R.id.contact_zsidebar);
+        clearEditText = findView(R.id.ll_search);
     }
 
     @Override
@@ -66,6 +75,29 @@ public class MainFragment2 extends BaseFragment {
         }else{
             Toast.makeText(mActivity, "ticket为null", Toast.LENGTH_SHORT).show();
         }
+
+        clearEditText.setCursorVisible(false);
+        //根据输入框输入值的改变来过滤搜索
+        clearEditText.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //当输入框里面的值为空，更新为原来的列表，否则为过滤数据列表
+                filterData(s.toString());
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
     }
 
     @Override
@@ -152,4 +184,43 @@ public class MainFragment2 extends BaseFragment {
     public void onHttpError(int reqType, String error) {
         super.onHttpError(reqType, error);
     }
+
+
+    /**
+     * 根据输入框中的值来过滤数据并更新RecyclerView
+     *
+     * @param filterStr
+     */
+    private void filterData(String filterStr) {
+        List<LoginFriendGroups.ResultBean.GroupsBean.FriendsBean> filterDateList = new ArrayList<>();
+
+        if (TextUtils.isEmpty(filterStr)) {
+            filterDateList = friendsBeans;
+        } else {
+            filterDateList.clear();
+            for (LoginFriendGroups.ResultBean.GroupsBean.FriendsBean sortModel : friendsBeans) {
+                String name="";
+                if (StringUtils.isNotBlank(sortModel.getRemarkname())){
+                    name = sortModel.getRemarkname();
+
+                }else{
+                    name = sortModel.getNickname();
+                }
+
+                if (name.indexOf(filterStr.toString()) != -1 ||
+                        PinyinUtils.getFirstSpell(name).startsWith(filterStr.toString())
+                        //不区分大小写
+                        || PinyinUtils.getFirstSpell(name).toLowerCase().startsWith(filterStr.toString())
+                        || PinyinUtils.getFirstSpell(name).toUpperCase().startsWith(filterStr.toString())
+                        ) {
+                    filterDateList.add(sortModel);
+                }
+            }
+        }
+
+        // 根据a-z进行排序
+        Collections.sort(filterDateList, pinyinComparator);
+        mainFragment2Adapter.updateList(filterDateList);
+    }
+
 }

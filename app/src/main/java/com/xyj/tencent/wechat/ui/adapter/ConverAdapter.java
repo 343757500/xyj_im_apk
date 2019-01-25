@@ -10,6 +10,7 @@ import com.xyj.tencent.wechat.ui.holder.ConverAmrHolder;
 import com.xyj.tencent.wechat.ui.holder.ConverFileHolder;
 import com.xyj.tencent.wechat.ui.holder.ConverHolder;
 import com.xyj.tencent.wechat.ui.holder.ConverPicHolder;
+import com.xyj.tencent.wechat.ui.holder.ConverSendPicHolder;
 import com.xyj.tencent.wechat.ui.holder.ConverSendTextHolder;
 import com.xyj.tencent.wechat.ui.holder.ConverVideoHolder;
 
@@ -33,6 +34,10 @@ public class ConverAdapter extends BaseAdapterRV {
 
         if (viewType==3){
             return new ConverPicHolder(context,parent,this,viewType);
+        }
+
+        if (viewType==4){
+            return new ConverSendPicHolder(context,parent,this,viewType);
         }
 
         if (viewType==34){
@@ -64,8 +69,12 @@ public class ConverAdapter extends BaseAdapterRV {
         }else if (item.getType().equals("2")) {
             return 2;
         }else if (item.getType().equals("3")){
-            return 3;
-        }else if (item.getType().equals("34")){
+            if ("0".equals(item.getMsgState())){
+                return 4;
+            }else{
+                return 3;
+            }
+        } else if (item.getType().equals("34")){
             return 34;
         }else if (item.getType().equals("43")){
             return 43;

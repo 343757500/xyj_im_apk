@@ -3,16 +3,21 @@ package com.xyj.tencent.wechat.ui.holder;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
 import com.xyj.tencent.R;
 import com.xyj.tencent.common.ui.BaseAdapterRV;
 import com.xyj.tencent.common.ui.BaseHolderRV;
 import com.xyj.tencent.wechat.model.bean.ImMessageBean;
+import com.xyj.tencent.wechat.util.DateUtil;
 
 public class ConverHolder extends BaseHolderRV {
 
     private TextView tv_content;
+    private ImageView iv_user_receiver;
+    private TextView tv_time;
 
     public ConverHolder(Context context, ViewGroup parent, BaseAdapterRV adapter, int itemType) {
         super(context, parent, adapter, itemType, R.layout.item_chating_receiver_text_success);
@@ -21,11 +26,16 @@ public class ConverHolder extends BaseHolderRV {
     @Override
     public void onFindViews(View itemView) {
         tv_content = itemView.findViewById(R.id.tv_content);
+        iv_user_receiver = itemView.findViewById(R.id.iv_user_receiver);
+        tv_time = itemView.findViewById(R.id.tv_time);
     }
 
     @Override
     protected void onRefreshView(Object bean, int position) {
         ImMessageBean imMessageBean= (ImMessageBean) bean;
         tv_content.setText(imMessageBean.getContent()   );
+        Picasso.with(context).load(imMessageBean.getHeadUrl()).into(iv_user_receiver);
+        String s = DateUtil.longToString(imMessageBean.getConversationTime(), "MM月dd日 HH:mm");
+        tv_time.setText(s + "");
     }
 }

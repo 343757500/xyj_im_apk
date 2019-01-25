@@ -3,6 +3,7 @@ package com.xyj.tencent.wechat.ui.activity;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Message;
+import android.provider.Settings;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -10,6 +11,10 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
+import com.donkingliang.imageselector.entry.Folder;
+import com.donkingliang.imageselector.model.ImageModel;
+import com.donkingliang.imageselector.utils.ImageSelector;
+import com.donkingliang.imageselector.utils.ImageSelectorUtils;
 import com.tencent.imsdk.TIMConversation;
 import com.tencent.imsdk.TIMConversationType;
 import com.tencent.imsdk.TIMManager;
@@ -48,7 +53,13 @@ public class ConverActivity extends BaseActivity implements ChatView {
     private ConverAdapter converAdapter;
     private String headUrl;
     private String wxid;
+    private String wxno;
+    private String remarkname;
     private String fromAccount;
+    private String nickname;
+    private String fid;
+    private static final int IMAGE_STORE = 200;
+    private static final int REQUEST_CODE = 0x00000011;
 
     @Override
     public int getLayoutRes() {
@@ -74,15 +85,17 @@ public class ConverActivity extends BaseActivity implements ChatView {
     @Override
     public void initData() {
         Intent intent = getIntent();
-        String nickname = intent.getStringExtra("nickName");
-        String fid = intent.getStringExtra("fid");
+        nickname = intent.getStringExtra("nickName");
+        fid = intent.getStringExtra("fid");
         wxid = intent.getStringExtra("wxid");
+        wxno = intent.getStringExtra("wxno");
+        remarkname = intent.getStringExtra("remarkname");
         fromAccount = SharedPreUtil.getString(this,"wechatId","");
         headUrl = intent.getStringExtra("headUrl");
         chatPresenter = new ChatPresenter(this, fromAccount, TIMConversationType.C2C);
         imMessageList = DBUtils.getNewHistory(wxid, fromAccount);
 
-        IsReadUtil.fid=fid;
+        IsReadUtil.fid= fid;
         tv_title.setText(nickname);
         //更新数据库里面已读的标志
         updateReceiverState(fid);
@@ -161,7 +174,17 @@ public class ConverActivity extends BaseActivity implements ChatView {
 
     @Override
     public void sendImage() {
+    /*    Intent intent_album = new Intent("android.intent.action.GET_CONTENT");
+        intent_album.setType("image/*");
+        startActivityForResult(intent_album, IMAGE_STORE);*/
+        ImageSelectorUtils.openPhoto(this, REQUEST_CODE, false, 9);
+      /*  ImageModel.loadImageForSDCard(this, new ImageModel.DataCallback() {
+            @Override
+            public void onSuccess(ArrayList<Folder> folders) {
+                //folders是图片文件夹的列表，每个文件夹中都有若干张图片。
 
+            }
+        });*/
     }
 
     @Override
@@ -172,16 +195,10 @@ public class ConverActivity extends BaseActivity implements ChatView {
     @Override
     public void sendText() {
         String sendMessage = input_panel.getText().toString();
-        //String wxno = imMessageList.get(0).getWxno();
-       // String fromAccount = imMessageList.get(0).getFromAccount();
         String toAccount =  SharedPreUtil.getString(this,"relationId","");
-        //String id = imMessageList.get(0).getId();
-        //String headUrl = imMessageList.get(0).getHeadUrl();
-       // String nickName = imMessageList.get(0).getNickName();
-       // String remarkName = imMessageList.get(0).getRemarkName();
         Log.e("111",wxid+":"+fromAccount+":"+toAccount+":"+sendMessage);
         //im   frimAccount  来至这个apk的IM
-        final SendMsgBean sendMsgBean=new SendMsgBean(wxid,wxid,toAccount,fromAccount,sendMessage,1542625414005L,1,true,"000000",headUrl,"","");
+        final SendMsgBean sendMsgBean=new SendMsgBean(wxno,wxid,toAccount,fromAccount,sendMessage, System.currentTimeMillis(),1,true,fid,headUrl,nickname,remarkname);
         String json = JSON.toJSONString(sendMsgBean);
             String peer = fromAccount;  //获取与用户 "sample_user_1" 的会话   //621c62f470e94160a4f9417fe82966b2
             TIMConversation conversation = TIMManager.getInstance().getConversation(
@@ -249,4 +266,55 @@ public class ConverActivity extends BaseActivity implements ChatView {
     public void showDraft(TIMMessageDraft draft) {
 
     }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode==IMAGE_STORE){
+            Log.e("111",data.getData()+"77");
+        }else if(requestCode==REQUEST_CODE&&data!=null){
+            ArrayList<String> images = data.getStringArrayListExtra(ImageSelector.SELECT_RESULT);
+            Log.e("111",images.toString()+"images");
+            sendImaginUrl(images.toString());
+        }
+    }
+
+    private void sendImaginUrl(String images) {
+        String toAccount =  SharedPreUtil.getString(this,"relationId","");
+        Log.e("111",wxid+":"+fromAccount+":"+toAccount+":"+images);
+        //im   frimAccount  来至这个apk的IM
+        final SendMsgBean sendMsgBean=new SendMsgBean(wxno,wxid,toAccount,fromAccount,images, System.currentTimeMillis(),3,true,fid,headUrl,nickname,remarkname);
+        String json = JSON.toJSONString(sendMsgBean);
+        String peer = fromAccount;  //获取与用户 "sample_user_1" 的会话   //621c62f470e94160a4f9417fe82966b2
+        TIMConversation conversation = TIMManager.getInstance().getConversation(
+                TIMConversationType.C2C,    //会话类型：单聊
+                peer);                      //会话对方用户帐号//对方id
+        //构造一条消息
+        TIMMessage msg = new TIMMessage();
+        //添加文本内容
+        TIMTextElem elem = new TIMTextElem();
+        elem.setText(json);
+        //将elem添加到消息
+        if (msg.addElement(elem) != 0) {
+            Log.d("111", "addElement failed");
+            return;
+        }
+        //发送消息
+        conversation.sendMessage(msg, new TIMValueCallBack<TIMMessage>() {//发送消息回调
+            @Override
+            public void onError(int code, String desc) {//发送消息失败
+                Log.e("111", "send message failed. code: " + code + " errmsg: " + desc);
+            }
+
+            @Override
+            public void onSuccess(TIMMessage msg) {//发送消息成功
+                Log.e("111","发送消息成功"+msg.getMsgId());
+                chatPresenter.sendMessage(msg,sendMsgBean);
+                input_panel.setText("");
+            }
+        });
+    }
+
+
 }

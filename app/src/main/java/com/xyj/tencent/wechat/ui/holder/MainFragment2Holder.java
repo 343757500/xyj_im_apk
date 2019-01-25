@@ -56,7 +56,8 @@ public class MainFragment2Holder extends BaseHolderRV<LoginFriendGroups.ResultBe
         Intent intent=new Intent(context,ConverActivity.class);
         intent.putExtra("nickName",bean.getNickname());
         intent.putExtra("wxid",bean.getWxid());
-       // intent.putExtra("fromAccount",bean.getFromAccount());
+        intent.putExtra("wxno",bean.getWxno());
+        intent.putExtra("remarkname",bean.getRemarkname());
         String fromAccount = DBUtils.selectFbyWxid(bean.getWxid());
         intent.putExtra("fromAccount",fromAccount);
         intent.putExtra("fid",bean.getId());

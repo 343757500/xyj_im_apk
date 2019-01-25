@@ -23,7 +23,7 @@
             />
     </RelativeLayout>
 
-    <LinearLayout
+  <!--  <LinearLayout
         android:id="@+id/ll_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -51,7 +51,19 @@
             android:layout_marginLeft="4dp"
             android:textSize="16sp"
             />
-    </LinearLayout>
+    </LinearLayout>-->
+
+    <com.xyj.tencent.wechat.ui.widget.ClearEditText
+        android:id="@+id/ll_search"
+        android:hint="搜索"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#fff"
+        android:padding="4dp"
+        android:gravity="center"
+        android:layout_marginLeft="7dp"
+        android:layout_marginRight="7dp"
+        android:layout_marginTop="14dp" />
 
 
     <FrameLayout

@@ -65,5 +65,5 @@ dependencies {
 // 图片请求picasso
     implementation 'com.squareup.picasso:picasso:2.3.2'
     implementation 'org.greenrobot:eventbus:3.1.1'
-
+    implementation 'com.github.donkingliang:ImageSelector:1.6.8'
 }
