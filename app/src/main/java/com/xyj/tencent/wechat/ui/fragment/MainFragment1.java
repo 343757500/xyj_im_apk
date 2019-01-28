@@ -1,6 +1,7 @@
 package com.xyj.tencent.wechat.ui.fragment;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.widget.LinearLayoutManager;
@@ -28,6 +29,7 @@ import com.xyj.tencent.wechat.model.bean.ImMessageBean;
 import com.xyj.tencent.wechat.model.bean.LoginFriendGroups;
 import com.xyj.tencent.wechat.model.db.DBUtils;
 import com.xyj.tencent.wechat.model.db.MyDbHelper;
+import com.xyj.tencent.wechat.ui.activity.ConverActivity;
 import com.xyj.tencent.wechat.ui.adapter.ChatGroupAdapter;
 import com.xyj.tencent.wechat.ui.adapter.UserSelectAdapter;
 import com.xyj.tencent.wechat.ui.adapter.UserSelectFragementAdapter;
@@ -35,6 +37,7 @@ import com.xyj.tencent.wechat.ui.adapter.UserSelectFriendGroupAdapter;
 import com.xyj.tencent.wechat.util.IsReadUtil;
 
 import org.apache.commons.lang3.StringUtils;
+import org.greenrobot.eventbus.EventBus;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -123,6 +126,7 @@ public class MainFragment1 extends BaseFragment {
                                             insertImMessageBean(messageBean);
                                             initData();
 
+                                             EventBus.getDefault().postSticky(imMessageBeans);
                                     }
                                 }
                             }
@@ -197,7 +201,7 @@ public class MainFragment1 extends BaseFragment {
        // Collections.reverse(list);
         chatGroupAdapter = new ChatGroupAdapter(getActivity(), list);
         rv_list.setAdapter(chatGroupAdapter);
-       // chatGroupAdapter.notifyDataSetChanged();
+        chatGroupAdapter.notifyDataSetChanged();
 
 
 

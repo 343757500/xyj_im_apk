@@ -2,17 +2,14 @@ package com.xyj.tencent.wechat.ui.activity;
 
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Message;
-import android.provider.Settings;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
-import com.donkingliang.imageselector.entry.Folder;
-import com.donkingliang.imageselector.model.ImageModel;
 import com.donkingliang.imageselector.utils.ImageSelector;
 import com.donkingliang.imageselector.utils.ImageSelectorUtils;
 import com.tencent.imsdk.TIMConversation;
@@ -127,7 +124,19 @@ public class ConverActivity extends BaseActivity implements ChatView {
 
     @Subscribe(threadMode = ThreadMode.MAIN,sticky = true)
     public void getData(List<ImMessageBean> tableChatList){
-        this.imMessageList=tableChatList;
+        re_list = findView(R.id.list);
+
+        String wxid = imMessageList.get(0).getWxid();
+        String wechatId = SharedPreUtil.getString(this, "wechatId", "");
+        imMessageList = DBUtils.getNewHistory(wxid,wechatId);
+
+        LinearLayoutManager linearLayoutManager=new LinearLayoutManager(this);
+        linearLayoutManager.setStackFromEnd(true);
+        re_list.setLayoutManager(linearLayoutManager);
+        converAdapter = new ConverAdapter(this, imMessageList);
+
+        re_list.setAdapter(converAdapter);
+        converAdapter.notifyDataSetChanged();
 
     }
 
@@ -174,17 +183,7 @@ public class ConverActivity extends BaseActivity implements ChatView {
 
     @Override
     public void sendImage() {
-    /*    Intent intent_album = new Intent("android.intent.action.GET_CONTENT");
-        intent_album.setType("image/*");
-        startActivityForResult(intent_album, IMAGE_STORE);*/
         ImageSelectorUtils.openPhoto(this, REQUEST_CODE, false, 9);
-      /*  ImageModel.loadImageForSDCard(this, new ImageModel.DataCallback() {
-            @Override
-            public void onSuccess(ArrayList<Folder> folders) {
-                //folders是图片文件夹的列表，每个文件夹中都有若干张图片。
-
-            }
-        });*/
     }
 
     @Override

@@ -110,7 +110,7 @@ public class ChatGroupHolder extends BaseHolderRV<ArrayList<ImMessageBean>> {
         intent.putExtra("headUrl",imMessageBean.getHeadUrl());
         context.startActivity(intent);
 
-        EventBus.getDefault().postSticky(bean);
+       // EventBus.getDefault().postSticky(bean);
     }
 
 }
