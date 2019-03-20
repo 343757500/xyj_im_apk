@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -12,6 +13,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 import com.tencent.imsdk.TIMElem;
@@ -19,6 +22,7 @@ import com.tencent.imsdk.TIMElemType;
 import com.tencent.imsdk.TIMManager;
 import com.tencent.imsdk.TIMMessage;
 import com.tencent.imsdk.TIMMessageListener;
+import com.tencent.imsdk.TIMMessageOfflinePushSettings;
 import com.tencent.imsdk.TIMTextElem;
 import com.tencent.imsdk.TIMUserProfile;
 import com.xyj.tencent.R;
@@ -39,6 +43,7 @@ import com.xyj.tencent.wechat.util.IsReadUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -102,8 +107,6 @@ public class MainFragment1 extends BaseFragment {
                                         Log.e("111","收到消息了。。。。。" + textElem.getText().replaceAll("&quot;", "\""));
                                         boolean contains = imMessageName.contains(messageBean.getWxno());
                                         Log.e("111",contains+"");
-
-
                                         //这里处理数据集合中存在则删除的逻辑，防止同一个聊天recelyview显示多条item
                                         for (int k = 0; k < imMessageBeans.size(); k++) {
                                             if (imMessageBeans.get(k).getWxid().contains(messageBean.getWxid())){

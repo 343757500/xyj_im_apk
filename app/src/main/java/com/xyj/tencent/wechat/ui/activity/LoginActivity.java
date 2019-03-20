@@ -4,7 +4,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,6 +15,7 @@ import com.tencent.imsdk.TIMCallBack;
 import com.tencent.imsdk.TIMLogLevel;
 import com.tencent.imsdk.TIMLogListener;
 import com.tencent.imsdk.TIMManager;
+import com.tencent.imsdk.TIMOfflinePushSettings;
 import com.tencent.imsdk.TIMSdkConfig;
 import com.tencent.imsdk.TIMUser;
 import com.xyj.tencent.R;
@@ -25,6 +28,8 @@ import com.xyj.tencent.wechat.model.bean.LoginFriendGroups;
 import com.xyj.tencent.wechat.model.bean.LoginTicket;
 import com.xyj.tencent.wechat.model.protocol.IHttpService;
 import com.xyj.tencent.wechat.presenter.LoginPresenter;
+import com.xyj.tencent.wechat.util.RSAUtils;
+import com.xyj.tencent.wechat.util.ReadAssstsUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -84,9 +89,19 @@ public class LoginActivity extends BaseActivity {
 
 
     private void login(String username,String password) {
+
+        String publicKey= ReadAssstsUtil.readAssetsTxt(getApplicationContext());
+        String passwordkey="";
+        try {
+            passwordkey= RSAUtils.encryptyPublicKey(password,publicKey);
+            Log.e("111",passwordkey+"----");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         Map<String, String> map =new HashMap<String, String>();
-        map.put("username","20180914");
-        map.put("password","ji4V3TYRm+CvhbxwSkDoTu3/gJuZfWdGXM5a2bIszXoDoY0brDXAcxslK98BaclkcQxFbpfm6wflAlrOcuB/sIIL3i4pg03DoBMCTVFebKYQ9uIQroT+dS5tiPJLh3GITeqRip0LWEsV4aU3WZKEIhsQnGQUkcMn5AfnODQoaT4=");
+        map.put("username",username);
+        map.put("password",passwordkey);
         loginPresenter.login(map);
     }
 
@@ -161,8 +176,23 @@ public class LoginActivity extends BaseActivity {
                 showToast("登录IM成功");
                 getFriendGroups(ticket);
 
+                //集成离线推送
+                Impush();
+
             }
         });
+    }
+
+    private void Impush() {
+        TIMOfflinePushSettings settings = new TIMOfflinePushSettings();
+//开启离线推送
+        settings.setEnabled(true);
+//设置收到 C2C 离线消息时的提示声音，这里把声音文件放到了 res/raw 文件夹下
+        settings.setC2cMsgRemindSound(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.dudulu));
+//设置收到群离线消息时的提示声音，这里把声音文件放到了 res/raw 文件夹下
+        settings.setGroupMsgRemindSound(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.dudulu));
+
+        TIMManager.getInstance().setOfflinePushSettings(settings);
     }
 
     /**

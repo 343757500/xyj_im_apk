@@ -34,10 +34,10 @@
         android:drawableLeft="@mipmap/login_username"
         android:drawablePadding="10dp"
         android:layout_marginTop="20dp"
-        android:inputType="number"
         android:maxLength="20"
         android:maxLines="1"
         android:textColor="#fff"
+        android:text="xyjbd"
         />
 
     <EditText
@@ -45,6 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="密码"
+        android:text="123456"
         android:textColorHint="#fff"
         android:background="@drawable/shape_login_page_username"
         android:padding="15dp"
