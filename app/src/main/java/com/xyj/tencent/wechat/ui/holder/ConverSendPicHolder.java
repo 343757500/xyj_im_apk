@@ -29,9 +29,7 @@ public class ConverSendPicHolder extends BaseHolderRV {
     protected void onRefreshView(Object bean, int position) {
         ImMessageBean imMessageBean= (ImMessageBean) bean;
         String content = imMessageBean.getContent();
-        String sTemp = content.substring(1, content.length()-1);
-        String[] sArray = sTemp.split(",");
-        Log.e("111","本地图片地址"+sArray[0]);
-        Picasso.with(context).load("file://"+sArray[0]).into(iv);
+        Log.e("111","本地图片地址"+content);
+        Picasso.with(context).load(content).into(iv);
     }
 }

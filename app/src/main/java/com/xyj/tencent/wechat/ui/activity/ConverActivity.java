@@ -23,8 +23,13 @@ import com.tencent.imsdk.TIMMessageOfflinePushSettings;
 import com.tencent.imsdk.TIMTextElem;
 import com.tencent.imsdk.TIMValueCallBack;
 import com.tencent.imsdk.ext.message.TIMMessageDraft;
+import com.upyun.library.common.Params;
+import com.upyun.library.common.UploadEngine;
+import com.upyun.library.listener.UpCompleteListener;
+import com.upyun.library.listener.UpProgressListener;
 import com.xyj.tencent.R;
 import com.xyj.tencent.common.base.BaseActivity;
+import com.xyj.tencent.common.base.Const;
 import com.xyj.tencent.common.base.MyApp;
 import com.xyj.tencent.common.util.SharedPreUtil;
 import com.xyj.tencent.wechat.model.bean.ImMessageBean;
@@ -35,14 +40,22 @@ import com.xyj.tencent.wechat.ui.adapter.ConverAdapter;
 import com.xyj.tencent.wechat.ui.widget.ChatInput;
 import com.xyj.tencent.wechat.ui.widget.ChatView;
 import com.xyj.tencent.wechat.util.IsReadUtil;
+import com.xyj.tencent.wechat.util.UpYunUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static com.android.volley.VolleyLog.TAG;
 
 public class ConverActivity extends BaseActivity implements ChatView {
 
@@ -202,6 +215,8 @@ public class ConverActivity extends BaseActivity implements ChatView {
         String toAccount =  SharedPreUtil.getString(this,"relationId","");
         Log.e("111",wxid+":"+fromAccount+":"+toAccount+":"+sendMessage);
         //im   frimAccount  来至这个apk的IM
+
+
         final SendMsgBean sendMsgBean=new SendMsgBean(wxno,wxid,toAccount,fromAccount,sendMessage, System.currentTimeMillis(),1,true,fid,headUrl,nickname,remarkname);
         String json = JSON.toJSONString(sendMsgBean);
             String peer = fromAccount;  //获取与用户 "sample_user_1" 的会话   //621c62f470e94160a4f9417fe82966b2
@@ -212,14 +227,6 @@ public class ConverActivity extends BaseActivity implements ChatView {
             TIMMessage msg = new TIMMessage();
             //添加文本内容
             TIMTextElem elem = new TIMTextElem();
-
-
-
-
-
-
-
-
             elem.setText(json);
             //将elem添加到消息
             if (msg.addElement(elem) != 0) {
@@ -232,7 +239,6 @@ public class ConverActivity extends BaseActivity implements ChatView {
                 public void onError(int code, String desc) {//发送消息失败
                     Log.e("111", "send message failed. code: " + code + " errmsg: " + desc);
                 }
-
                 @Override
                 public void onSuccess(TIMMessage msg) {//发送消息成功
                     Log.e("111","发送消息成功"+msg.getMsgId());
@@ -240,8 +246,6 @@ public class ConverActivity extends BaseActivity implements ChatView {
                     input_panel.setText("");
                 }
             });
-
-
         }
 
     @Override
@@ -287,46 +291,55 @@ public class ConverActivity extends BaseActivity implements ChatView {
             Log.e("111",data.getData()+"77");
         }else if(requestCode==REQUEST_CODE&&data!=null){
             ArrayList<String> images = data.getStringArrayListExtra(ImageSelector.SELECT_RESULT);
-            Log.e("111",images.toString()+"images");
-            sendImaginUrl(images.toString());
+            for (int i = 0; i < images.size(); i++) {
+                sendImaginUrl(images.get(i)+"");
+            }
+
         }
     }
 
-    private void sendImaginUrl(String images) {
-        String toAccount =  SharedPreUtil.getString(this,"relationId","");
+    private void sendImaginUrl(final String images) {
+        final String toAccount =  SharedPreUtil.getString(this,"relationId","");
         Log.e("111",wxid+":"+fromAccount+":"+toAccount+":"+images);
-        //im   frimAccount  来至这个apk的IM
-        final SendMsgBean sendMsgBean=new SendMsgBean(wxno,wxid,toAccount,fromAccount,images, System.currentTimeMillis(),3,true,fid,headUrl,nickname,remarkname);
-        String json = JSON.toJSONString(sendMsgBean);
-        String peer = fromAccount;  //获取与用户 "sample_user_1" 的会话   //621c62f470e94160a4f9417fe82966b2
-        TIMConversation conversation = TIMManager.getInstance().getConversation(
-                TIMConversationType.C2C,    //会话类型：单聊
-                peer);                      //会话对方用户帐号//对方id
-        //构造一条消息
-        TIMMessage msg = new TIMMessage();
-        //添加文本内容
-        TIMTextElem elem = new TIMTextElem();
-        elem.setText(json);
-        //将elem添加到消息
-        if (msg.addElement(elem) != 0) {
-            Log.d("111", "addElement failed");
-            return;
-        }
-        //发送消息
-        conversation.sendMessage(msg, new TIMValueCallBack<TIMMessage>() {//发送消息回调
+        UpYunUtils.getUpPicUrl(images, new UpYunUtils.UpYunListener() {
             @Override
-            public void onError(int code, String desc) {//发送消息失败
-                Log.e("111", "send message failed. code: " + code + " errmsg: " + desc);
+            public void success(String url) {
+                final SendMsgBean sendMsgBean = new SendMsgBean(wxno, wxid, toAccount, fromAccount, url, System.currentTimeMillis(), 3, true, fid, headUrl, nickname, remarkname);
+                String json = JSON.toJSONString(sendMsgBean);
+                String peer = fromAccount;  //获取与用户 "sample_user_1" 的会话   //621c62f470e94160a4f9417fe82966b2
+                TIMConversation conversation = TIMManager.getInstance().getConversation(
+                        TIMConversationType.C2C,    //会话类型：单聊
+                        peer);                      //会话对方用户帐号//对方id
+                //构造一条消息
+                TIMMessage msg = new TIMMessage();
+                //添加文本内容
+                TIMTextElem elem = new TIMTextElem();
+                elem.setText(json);
+                //将elem添加到消息
+                if (msg.addElement(elem) != 0) {
+                    return;
+                }
+                //发送消息
+                conversation.sendMessage(msg, new TIMValueCallBack<TIMMessage>() {//发送消息回调
+                    @Override
+                    public void onError(int code, String desc) {//发送消息失败
+                        Log.e("111", "send message failed. code: " + code + " errmsg: " + desc);
+                    }
+                    @Override
+                    public void onSuccess(TIMMessage msg) {//发送消息成功
+                        Log.e("111", "发送消息成功" + msg.getMsgId());
+                        chatPresenter.sendMessage(msg, sendMsgBean);
+                        input_panel.setText("");
+                    }
+                });
             }
 
             @Override
-            public void onSuccess(TIMMessage msg) {//发送消息成功
-                Log.e("111","发送消息成功"+msg.getMsgId());
-                chatPresenter.sendMessage(msg,sendMsgBean);
-                input_panel.setText("");
+            public void fail(String message) {
+
             }
         });
-    }
 
+    }
 
 }

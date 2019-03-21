@@ -24,7 +24,6 @@ public interface IHttpService {
     String HOST_URL =  Const.HOST ;
 
 
-
     int TYPE_LOGIN = 5;
     int TYPE_LOGINTICKET = 6;
     int TYPE_LOGINFRIENDGROUP = 7;

@@ -1,9 +1,7 @@
 package com.xyj.tencent.wechat.ui.activity;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Message;
 import android.util.Log;

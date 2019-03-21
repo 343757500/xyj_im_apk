@@ -5,6 +5,7 @@ public class Const {
 	public static final String HOST_IP = "192.168.1.39";
 
     public static final String HOST = "http://47.107.77.220:8080/"; //http://120.24.102.187:8077/
+    public static final String YOUPAIYUN ="https://upyun.ijucaimao.cn";
 
     public static final String NEWLOGIN = HOST + "api/1.0/account/login";
 //	public static final String HOST_IP = "45.78.29.236";

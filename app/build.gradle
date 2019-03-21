@@ -68,4 +68,7 @@ dependencies {
     implementation 'org.greenrobot:eventbus:3.1.1'
     implementation 'com.github.donkingliang:ImageSelector:1.6.8'
     implementation files('libs/mycommons-codec-1.11.jar')
+
+    //又拍云存储sdk
+    implementation 'com.upyun:upyun-android-sdk:2.0.6'
 }
