@@ -68,11 +68,11 @@
         android:textColor="#fff"
         />
 
-    <WebView
+  <!--  <WebView
         android:id="@+id/webview"
         android:layout_width="0dp"
         android:layout_height="0dp"/>
-
+-->
 
 
 

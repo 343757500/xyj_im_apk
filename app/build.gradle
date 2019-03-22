@@ -71,4 +71,8 @@ dependencies {
 
     //又拍云存储sdk
     implementation 'com.upyun:upyun-android-sdk:2.0.6'
+
+    //必须使用
+    compile 'com.lzy.net:okgo:3.0.4'
+    compile 'com.gyf.immersionbar:immersionbar:2.3.3-beta06'
 }

@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
 import com.xyj.tencent.R;
+import com.xyj.tencent.common.base.MyApp;
 import com.xyj.tencent.common.ui.BaseAdapterRV;
 import com.xyj.tencent.common.ui.BaseHolderRV;
 import com.xyj.tencent.common.util.SharedPreUtil;
@@ -56,6 +57,7 @@ public class UserSelectHolder extends BaseHolderRV<LoginFriendGroups.ResultBean>
     protected void onItemClick(View itemView, int position, LoginFriendGroups.ResultBean bean) {
         super.onItemClick(itemView, position, bean);
         SharedPreUtil.saveInt(context,"selectindex",position);
+        MyApp.setIndexUser(position);
         Intent intent=new Intent(context, HomeActivityVersion1.class);
         context.startActivity(intent);
     }

@@ -3,12 +3,16 @@ package com.xyj.tencent.wechat.ui.activity;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
@@ -39,6 +43,8 @@ import com.xyj.tencent.wechat.presenter.ChatPresenter;
 import com.xyj.tencent.wechat.ui.adapter.ConverAdapter;
 import com.xyj.tencent.wechat.ui.widget.ChatInput;
 import com.xyj.tencent.wechat.ui.widget.ChatView;
+import com.xyj.tencent.wechat.util.CheckImageUtils;
+import com.xyj.tencent.wechat.util.FileUtil;
 import com.xyj.tencent.wechat.util.IsReadUtil;
 import com.xyj.tencent.wechat.util.UpYunUtils;
 
@@ -75,6 +81,7 @@ public class ConverActivity extends BaseActivity implements ChatView {
     private String fid;
     private static final int IMAGE_STORE = 200;
     private static final int REQUEST_CODE = 0x00000011;
+    private static final int FILE_CODE = 300;
 
     @Override
     public int getLayoutRes() {
@@ -115,10 +122,11 @@ public class ConverActivity extends BaseActivity implements ChatView {
         //更新数据库里面已读的标志
         updateReceiverState(fid);
 
-        re_list.setLayoutManager(new LinearLayoutManager(this));
-        converAdapter = new ConverAdapter(this, imMessageList);
 
+        converAdapter = new ConverAdapter(this, imMessageList);
         re_list.setAdapter(converAdapter);
+        re_list.setLayoutManager(new LinearLayoutManager(this));
+        re_list.smoothScrollToPosition(imMessageList.size()-1);
 
     }
 
@@ -250,7 +258,9 @@ public class ConverActivity extends BaseActivity implements ChatView {
 
     @Override
     public void sendFile() {
-
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        startActivityForResult(intent, FILE_CODE);
     }
 
     @Override
@@ -265,7 +275,47 @@ public class ConverActivity extends BaseActivity implements ChatView {
 
     @Override
     public void sendVideo(String fileName) {
+        String cacheFilePath = FileUtil.getCacheFilePath(fileName);//真正的地址
+        final String toAccount =  SharedPreUtil.getString(this,"relationId","");
+        Log.e("111",wxid+":"+fromAccount+":"+toAccount+":"+cacheFilePath);
+        UpYunUtils.getUpVideoUrl(cacheFilePath, new UpYunUtils.UpYunListener() {
+            @Override
+            public void success(String url) {
+                final SendMsgBean sendMsgBean = new SendMsgBean(wxno, wxid, toAccount, fromAccount, url, System.currentTimeMillis(), 43, true, fid, headUrl, nickname, remarkname);
+                String json = JSON.toJSONString(sendMsgBean);
+                String peer = fromAccount;  //获取与用户 "sample_user_1" 的会话   //621c62f470e94160a4f9417fe82966b2
+                TIMConversation conversation = TIMManager.getInstance().getConversation(
+                        TIMConversationType.C2C,    //会话类型：单聊
+                        peer);                      //会话对方用户帐号//对方id
+                //构造一条消息
+                TIMMessage msg = new TIMMessage();
+                //添加文本内容
+                TIMTextElem elem = new TIMTextElem();
+                elem.setText(json);
+                //将elem添加到消息
+                if (msg.addElement(elem) != 0) {
+                    return;
+                }
+                //发送消息
+                conversation.sendMessage(msg, new TIMValueCallBack<TIMMessage>() {//发送消息回调
+                    @Override
+                    public void onError(int code, String desc) {//发送消息失败
+                        Log.e("111", "send message failed. code: " + code + " errmsg: " + desc);
+                    }
+                    @Override
+                    public void onSuccess(TIMMessage msg) {//发送消息成功
+                        Log.e("111", "发送消息成功" + msg.getMsgId());
+                        chatPresenter.sendMessage(msg, sendMsgBean);
+                        input_panel.setText("");
+                    }
+                });
+            }
 
+            @Override
+            public void fail(String message) {
+
+            }
+        });
     }
 
     @Override
@@ -284,6 +334,7 @@ public class ConverActivity extends BaseActivity implements ChatView {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -295,6 +346,17 @@ public class ConverActivity extends BaseActivity implements ChatView {
                 sendImaginUrl(images.get(i)+"");
             }
 
+        }else if (requestCode == FILE_CODE) {
+            if (resultCode == RESULT_OK) {
+                String filePath = FileUtil.getFilePath(this, data.getData());
+                if (filePath != null && CheckImageUtils.isImage(filePath)) {
+//                    Toast.makeText(this, "发送的是图片", Toast.LENGTH_SHORT).show();
+                   // showImagePreview(FileUtil.getFilePath(this, data.getData()));
+                } else {
+
+                    sendFile(FileUtil.getFilePath(this, data.getData()));
+                }
+            }
         }
     }
 
@@ -339,6 +401,63 @@ public class ConverActivity extends BaseActivity implements ChatView {
 
             }
         });
+
+    }
+
+    private int defaultType = 1;
+    //发送文件
+    private void sendFile(String path) {
+        if (path == null) return;
+        final String toAccount =  SharedPreUtil.getString(this,"relationId","");
+        File file = new File(path);
+        if (file.exists()) {
+            if (file.length() > 1024 * 1024 * 10) {
+                Toast.makeText(this, getString(R.string.chat_file_too_large), Toast.LENGTH_SHORT).show();
+            } else {
+
+                UpYunUtils.getUpFileUrl(path, new UpYunUtils.UpYunListener() {
+                    @Override
+                    public void success(String url) {
+                        final SendMsgBean sendMsgBean = new SendMsgBean(wxno, wxid, toAccount, fromAccount, url, System.currentTimeMillis(), 49, true, fid, headUrl, nickname, remarkname);
+                        String json = JSON.toJSONString(sendMsgBean);
+                        String peer = fromAccount;  //获取与用户 "sample_user_1" 的会话   //621c62f470e94160a4f9417fe82966b2
+                        TIMConversation conversation = TIMManager.getInstance().getConversation(
+                                TIMConversationType.C2C,    //会话类型：单聊
+                                peer);                      //会话对方用户帐号//对方id
+                        //构造一条消息
+                        TIMMessage msg = new TIMMessage();
+                        //添加文本内容
+                        TIMTextElem elem = new TIMTextElem();
+                        elem.setText(json);
+                        //将elem添加到消息
+                        if (msg.addElement(elem) != 0) {
+                            return;
+                        }
+                        //发送消息
+                        conversation.sendMessage(msg, new TIMValueCallBack<TIMMessage>() {//发送消息回调
+                            @Override
+                            public void onError(int code, String desc) {//发送消息失败
+                                Log.e("111", "send message failed. code: " + code + " errmsg: " + desc);
+                            }
+                            @Override
+                            public void onSuccess(TIMMessage msg) {//发送消息成功
+                                Log.e("111", "发送消息成功" + msg.getMsgId());
+                                chatPresenter.sendMessage(msg, sendMsgBean);
+                                input_panel.setText("");
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void fail(String message) {
+                        Log.e("111","");
+                    }
+                });
+
+            }
+        } else {
+            Toast.makeText(this, getString(R.string.chat_file_not_exist), Toast.LENGTH_SHORT).show();
+        }
 
     }
 

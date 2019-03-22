@@ -25,6 +25,8 @@
     //调用相机权限
     <uses-permission android:name="android.permission.CAMERA" />
 
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
 
     <application
         android:allowBackup="true"
@@ -45,6 +47,8 @@
         <activity android:name=".wechat.ui.activity.UserSelectActivity"/>
         <activity android:name=".wechat.ui.activity.HomeActivityVersion1"/>
         <activity android:name=".wechat.ui.activity.ConverActivity"/>
+        <activity android:name=".wechat.ui.activity.ShowFileTypeActivity"/>
+        <activity android:name=".wechat.ui.activity.ShowImagePicActivity"/>
 
 
         <!-- Android 9.0兼容配置 -->
@@ -122,7 +126,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
+                android:resource="@xml/provider_paths" />
         </provider>
 
     </application>

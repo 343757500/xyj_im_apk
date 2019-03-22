@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.xyj.tencent.R;
+import com.xyj.tencent.common.base.MyApp;
 import com.xyj.tencent.common.ui.BaseAdapterRV;
 import com.xyj.tencent.common.ui.BaseHolderRV;
 import com.xyj.tencent.wechat.model.bean.ImMessageBean;
@@ -34,7 +35,7 @@ public class ConverSendTextHolder extends BaseHolderRV {
     protected void onRefreshView(Object bean, int position) {
         ImMessageBean imMessageBean= (ImMessageBean) bean;
         tv_content.setText(imMessageBean.getContent());
-        Picasso.with(context).load(imMessageBean.getHeadUrl()).into(iv_user_send);
+        Picasso.with(context).load((MyApp.getGroupFriendsBean().getResult().get(MyApp.getIndexUser()).getHeadImgUrl())).into(iv_user_send);
         String s = DateUtil.longToString(imMessageBean.getConversationTime(), "MM月dd日 HH:mm");
         tv_time.setText(s + "");
     }

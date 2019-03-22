@@ -1,13 +1,17 @@
 package com.xyj.tencent.wechat.ui.activity;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.tencent.imsdk.TIMCallBack;
 import com.tencent.imsdk.TIMLogLevel;
@@ -29,7 +33,9 @@ import com.xyj.tencent.wechat.presenter.LoginPresenter;
 import com.xyj.tencent.wechat.util.RSAUtils;
 import com.xyj.tencent.wechat.util.ReadAssstsUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class LoginActivity extends BaseActivity {
@@ -39,6 +45,7 @@ public class LoginActivity extends BaseActivity {
     private Button btn_login;
     private LoginPresenter loginPresenter;
     private String ticket;
+    private final int REQUEST_PHONE_PERMISSIONS = 0;
 
     @Override
     public int getLayoutRes() {
@@ -53,6 +60,40 @@ public class LoginActivity extends BaseActivity {
         et_username = findView(R.id.et_username);
         et_password = findView(R.id.et_password);
         btn_login = findView(R.id.btn_login);
+
+
+        final List<String> permissionsList = new ArrayList<>();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if ((checkSelfPermission(Manifest.permission.READ_PHONE_STATE)!= PackageManager.PERMISSION_GRANTED)) permissionsList.add(Manifest.permission.READ_PHONE_STATE);
+            if ((checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED)) permissionsList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            if (permissionsList.size() == 0){
+               // init();
+            }else{
+                requestPermissions(permissionsList.toArray(new String[permissionsList.size()]),
+                        REQUEST_PHONE_PERMISSIONS);
+            }
+        }else{
+          //  init();
+        }
+
+    }
+
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_PHONE_PERMISSIONS:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //init();
+                } else {
+                    Toast.makeText(this,"您需要开启权限,并重启应用",Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     @Override

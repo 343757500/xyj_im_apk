@@ -62,9 +62,9 @@ public class DBUtils {
                 imMessageBean.setId(cursor.getString(12));
                 imMessageBean.setMsgState(cursor.getString(13));
             }
-            if (StringUtils.isNotBlank(cursor.getString(4))) {
+            //if (StringUtils.isNotBlank(cursor.getString(4))) {
                 imMessageBeans.add(imMessageBean);
-            }
+            //}
         }
 
         return imMessageBeans;

@@ -1,6 +1,7 @@
 package com.xyj.tencent.common.base;
 
 import android.app.Application;
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -38,12 +39,13 @@ public class MyApp extends Application {
 	public static LoginFriendGroups loginFriendGroups;
 	private static int indexUser=0;//选择用户的索引(从0开始)
 	private static MyDbHelper myDbHelper;
+	private static Context context;
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		Global.init(this);
-
+		context = getApplicationContext();
 		initTIMUserConfig();
 		initDb();
 	}
@@ -208,5 +210,9 @@ public class MyApp extends Application {
 					}
 				});
 
+	}
+
+	public static Context getContext() {
+		return context;
 	}
 }

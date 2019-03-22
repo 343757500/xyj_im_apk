@@ -10,8 +10,10 @@ import com.xyj.tencent.wechat.ui.holder.ConverAmrHolder;
 import com.xyj.tencent.wechat.ui.holder.ConverFileHolder;
 import com.xyj.tencent.wechat.ui.holder.ConverHolder;
 import com.xyj.tencent.wechat.ui.holder.ConverPicHolder;
+import com.xyj.tencent.wechat.ui.holder.ConverSendFileHolder;
 import com.xyj.tencent.wechat.ui.holder.ConverSendPicHolder;
 import com.xyj.tencent.wechat.ui.holder.ConverSendTextHolder;
+import com.xyj.tencent.wechat.ui.holder.ConverSendVideoHolder;
 import com.xyj.tencent.wechat.ui.holder.ConverVideoHolder;
 
 import java.util.List;
@@ -44,12 +46,20 @@ public class ConverAdapter extends BaseAdapterRV {
             return new ConverAmrHolder(context,parent,this,viewType);
         }
 
+
+        if (viewType==48){
+            return new ConverSendFileHolder(context,parent,this,viewType);
+        }
         if (viewType==49){
             return new ConverFileHolder(context,parent,this,viewType);
         }
 
         if (viewType==43){
             return new ConverVideoHolder(context,parent,this,viewType);
+        }
+
+        if (viewType==44){
+            return new ConverSendVideoHolder(context,parent,this,viewType);
         }
 
         return new ConverHolder(context,parent,this,viewType);
@@ -77,9 +87,17 @@ public class ConverAdapter extends BaseAdapterRV {
         } else if (item.getType().equals("34")){
             return 34;
         }else if (item.getType().equals("43")){
-            return 43;
+            if ("0".equals(item.getMsgState())){
+                return 44;
+            }else{
+                return 43;
+            }
         }else if (item.getType().equals("49")){
-            return 49;
+            if ("0".equals(item.getMsgState())){
+                return 48;
+            }else{
+                return 49;
+            }
         }
         return 1;
     }
