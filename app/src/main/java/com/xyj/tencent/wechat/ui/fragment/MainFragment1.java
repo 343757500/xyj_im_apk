@@ -29,6 +29,7 @@ import com.xyj.tencent.R;
 import com.xyj.tencent.common.base.BaseFragment;
 import com.xyj.tencent.common.base.MyApp;
 import com.xyj.tencent.common.util.SharedPreUtil;
+import com.xyj.tencent.wechat.event.OnlineEvent;
 import com.xyj.tencent.wechat.model.bean.ImMessageBean;
 import com.xyj.tencent.wechat.model.bean.LoginFriendGroups;
 import com.xyj.tencent.wechat.model.db.DBUtils;
@@ -42,6 +43,8 @@ import com.xyj.tencent.wechat.util.IsReadUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
@@ -60,6 +63,7 @@ public class MainFragment1 extends BaseFragment {
     //private static List<List<ImMessageBean>> list ;
     private List<String> imMessageName=new ArrayList<>();
     private ChatGroupAdapter chatGroupAdapter;
+    private UserSelectFragementAdapter userSelectFragementAdapter;
 
     @Override
     public int getLayoutRes() {
@@ -68,6 +72,8 @@ public class MainFragment1 extends BaseFragment {
 
     @Override
     public void initView() {
+        EventBus.getDefault().register(this);
+
         rv_select = findView(R.id.rv_select);
         rv_list = findView(R.id.rv_list);
         tv_current = findView(R.id.tv_current);
@@ -75,12 +81,15 @@ public class MainFragment1 extends BaseFragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         rv_select.setLayoutManager(linearLayoutManager);
-        rv_select.setAdapter(new UserSelectFragementAdapter(getActivity(), MyApp.getGroupFriendsBean().getResult()));
+        userSelectFragementAdapter = new UserSelectFragementAdapter(getActivity(), MyApp.getGroupFriendsBean().getResult());
+        rv_select.setAdapter(userSelectFragementAdapter);
 
         rv_list.setLayoutManager(new LinearLayoutManager(getActivity()));
         //rv_list.setAdapter(new UserSelectFriendGroupAdapter());
 
         NewMessageListener();
+
+
     }
 
     private void NewMessageListener() {
@@ -90,6 +99,7 @@ public class MainFragment1 extends BaseFragment {
 
                 for (int i = 0; i < list.size(); i++) {
                     TIMMessage timMessage = list.get(i);
+                    String msgId = timMessage.getMsgId();
                     for (int j = 0; j < timMessage.getElementCount(); j++) {
                         TIMElem timElem = timMessage.getElement(j);
                         //获取当前元素的类型
@@ -102,6 +112,7 @@ public class MainFragment1 extends BaseFragment {
                             final TIMTextElem textElem = (TIMTextElem) timElem;
                             if (!timMessage.isSelf()) {
                                 if (!TextUtils.isEmpty(textElem.getText().replaceAll("&quot;", "\""))) {
+                                    String s = textElem.getText().replaceAll("&quot;", "\"");
                                     ImMessageBean messageBean = new Gson().fromJson(textElem.getText().replaceAll("&quot;", "\""), ImMessageBean.class);
                                     if (!"202".equals(messageBean.getType())){
                                         Log.e("111","收到消息了。。。。。" + textElem.getText().replaceAll("&quot;", "\""));
@@ -126,10 +137,15 @@ public class MainFragment1 extends BaseFragment {
 
                                             imMessageBeans.add(messageBean);
                                             imMessageName.add(messageBean.getWxid());
-                                            insertImMessageBean(messageBean);
+                                            insertImMessageBean(messageBean,timMessage);
                                             initData();
 
                                              EventBus.getDefault().postSticky(imMessageBeans);
+
+                                     //接收到在线状态
+                                    }else if ("202".equals(messageBean.getType())){
+
+
                                     }
                                 }
                             }
@@ -142,7 +158,7 @@ public class MainFragment1 extends BaseFragment {
         });
     }
 
-    private void insertImMessageBean(ImMessageBean messageBean) {
+    private void insertImMessageBean(ImMessageBean messageBean,TIMMessage TIMMessage) {
         ContentValues values=new ContentValues();
         values.put("wxno",messageBean.getWxno());
         values.put("fromAccount",messageBean.getFromAccount());
@@ -156,6 +172,7 @@ public class MainFragment1 extends BaseFragment {
         values.put("remarkName",messageBean.getRemarkName());
         values.put("fid",messageBean.getId());
         values.put("msgState","1");
+        values.put("fmsgId",messageBean.getMsgId());
         Log.e("is",IsReadUtil.isConverActivity+":"+messageBean.getId()+":"+IsReadUtil.fid);
         if (IsReadUtil.isConverActivity&&messageBean.getId().equals(IsReadUtil.fid)){
             values.put("receiverState","0");//(接收状态 0接收成功且已读 1接收失败 2接收成功但是未读)
@@ -241,5 +258,74 @@ public class MainFragment1 extends BaseFragment {
     public void onResume() {
         super.onResume();
        initData();
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN,sticky = true)
+    public void onOnlineEvent(OnlineEvent onlineEvent){
+        ArrayList<ArrayList<ImMessageBean>> list=new ArrayList<>();
+
+        List<LoginFriendGroups.ResultBean> result = MyApp.getGroupFriendsBean().getResult();
+        int selectindex = SharedPreUtil.getInt(getActivity(), "selectindex", -1);
+        String headImgUrl = result.get(selectindex).getHeadImgUrl();
+        String nickname = result.get(selectindex).getNickname();
+        String wechatId = result.get(selectindex).getWechatId();
+
+        SharedPreUtil.saveString(getActivity(),"wechatId",wechatId);
+        tv_current.setText(nickname+"  的好友");
+        Picasso.with(getActivity()).load(headImgUrl).into(iv_current);
+
+
+        imMessageBeans.clear();
+        //初始化聊天记录最新一条
+        //select * from tb_chat where id in (select Max(id) from tb_chat group by wxno);
+        //imMessageBeans = DBUtils.getNewestHistory(imMessageBeans, wechatId);
+
+        int size = MyApp.getGroupFriendsBean().getResult().get(selectindex).getGroups().size();
+        for (int i = 0; i < size; i++) {
+            LoginFriendGroups.ResultBean.GroupsBean groupsBean = MyApp.getGroupFriendsBean().getResult().get(selectindex).getGroups().get(i);
+            List<LoginFriendGroups.ResultBean.GroupsBean.FriendsBean> friends = groupsBean.getFriends();
+            for (int j = 0; j < friends.size(); j++) {
+                ArrayList<ImMessageBean> newHistory = DBUtils.getNewHistory(friends.get(j).getWxid(), wechatId);
+                if (newHistory.size()>0){
+                    list.add(newHistory);
+                }
+            }
+        }
+        // Collections.reverse(list);
+        chatGroupAdapter = new ChatGroupAdapter(getActivity(), list);
+        rv_list.setAdapter(chatGroupAdapter);
+        chatGroupAdapter.notifyDataSetChanged();
+
+
+
+
+
+
+        SQLiteDatabase dbs = MyApp.getDbs();
+        dbs.delete("im_message",null,null);
+
+        List<LoginFriendGroups.ResultBean.GroupsBean> groups = result.get(selectindex).getGroups();
+        for (int i = 0; i < groups.size(); i++) {
+            for (int j = 0; j < groups.get(i).getFriends().size(); j++) {
+                ContentValues values=new ContentValues();
+                values.put("wxno",groups.get(i).getFriends().get(j).getWxno());
+                values.put("headUrl",groups.get(i).getFriends().get(j).getHeadImgUrl());
+                values.put("wxid",groups.get(i).getFriends().get(j).getWxid());
+                values.put("nickName",groups.get(i).getFriends().get(j).getNickname());
+                values.put("remarkName",groups.get(i).getFriends().get(j).getRemarkname());
+                values.put("imwechatId",result.get(selectindex).getWechatId());
+                dbs.insert("im_message",null,values);
+            }
+        }
+
+
+    }
+
+    @Override
+    public void onDestroy() {
+
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
     }
 }

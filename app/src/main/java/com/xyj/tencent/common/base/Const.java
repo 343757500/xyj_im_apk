@@ -6,6 +6,7 @@ public class Const {
 
     public static final String HOST = "http://47.107.77.220:8080/"; //http://120.24.102.187:8077/
     public static final String YOUPAIYUN ="https://upyun.ijucaimao.cn";
+    public static final String SEARCH_MESSAGE = HOST + "/api/1.0/wechatMessage";//查找聊天信息(查询视频是否上传成功)
 
     public static final String NEWLOGIN = HOST + "api/1.0/account/login";
 //	public static final String HOST_IP = "45.78.29.236";

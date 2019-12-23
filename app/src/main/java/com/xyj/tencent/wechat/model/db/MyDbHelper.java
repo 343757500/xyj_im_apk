@@ -52,7 +52,9 @@ public class MyDbHelper extends SQLiteOpenHelper {
                 "remarkName text," +
                 "receiverState text," +
                 "fid text," +
-                "msgState text"+")"
+                "msgState text," +
+                "fmsgId text"+")"
+
         );
     }
 

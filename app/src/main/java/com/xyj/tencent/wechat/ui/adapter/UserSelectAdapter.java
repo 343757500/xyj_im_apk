@@ -1,6 +1,7 @@
 package com.xyj.tencent.wechat.ui.adapter;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.ViewGroup;
 
 import com.xyj.tencent.common.ui.BaseAdapterRV;
@@ -19,4 +20,8 @@ public class UserSelectAdapter extends BaseAdapterRV<LoginFriendGroups.ResultBea
     public BaseHolderRV<LoginFriendGroups.ResultBean> createViewHolder(Context context, ViewGroup parent, int viewType) {
         return new UserSelectHolder(context,parent,this,viewType);
     }
+
+   /* public void updateUserState(){
+        notifyDataSetChanged();
+    }*/
 }

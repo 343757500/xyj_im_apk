@@ -25,6 +25,19 @@ public class ImMessageBean implements Comparable{
     private String receiverState;
     private String id;
 
+    private String f_id;
+    private String loaded;
+
+    public String getMsgId() {
+        return msgId;
+    }
+
+    public void setMsgId(String msgId) {
+        this.msgId = msgId;
+    }
+
+    private String msgId;
+
     public String getMsgState() {
         return msgState;
     }
@@ -156,5 +169,21 @@ public class ImMessageBean implements Comparable{
                 ", id='" + id + '\'' +
                 ", msgState='" + msgState + '\'' +
                 '}';
+    }
+
+    public String getF_id() {
+        return f_id;
+    }
+
+    public void setF_id(String f_id) {
+        this.f_id = f_id;
+    }
+
+    public String getLoaded() {
+        return loaded;
+    }
+
+    public void setLoaded(String loaded) {
+        this.loaded = loaded;
     }
 }

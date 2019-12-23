@@ -126,7 +126,9 @@ public class ConverActivity extends BaseActivity implements ChatView {
         converAdapter = new ConverAdapter(this, imMessageList);
         re_list.setAdapter(converAdapter);
         re_list.setLayoutManager(new LinearLayoutManager(this));
-        re_list.smoothScrollToPosition(imMessageList.size()-1);
+        if(imMessageList!=null&&imMessageList.size()>0) {
+            re_list.smoothScrollToPosition(imMessageList.size() - 1);
+        }
 
     }
 

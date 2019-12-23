@@ -28,6 +28,20 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
 
+
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <permission android:name="com.xyj.tencent.permission.MIPUSH_RECEIVE" android:protectionLevel="signature" />
+    <!--这里 com.tencent.imsdk 改成 App 的包名-->
+    <uses-permission android:name="com.xyj.tencent.permission.MIPUSH_RECEIVE" />
+    <!--这里 com.tencent.imsdk 改成 App 的包名-->
+
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -49,7 +63,7 @@
         <activity android:name=".wechat.ui.activity.ConverActivity"/>
         <activity android:name=".wechat.ui.activity.ShowFileTypeActivity"/>
         <activity android:name=".wechat.ui.activity.ShowImagePicActivity"/>
-
+        <activity android:name=".wechat.ui.activity.VideoActivity"/>
 
         <!-- Android 9.0兼容配置 -->
         <uses-library android:name="org.apache.http.legacy" android:required="false"/>
@@ -128,6 +142,62 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
+
+
+
+        <!--注：小米推送-->
+        <service
+            android:enabled="true"
+            android:process=":pushservice"
+            android:name="com.xiaomi.push.service.XMPushService"/>
+        <service
+            android:name="com.xiaomi.push.service.XMJobService"
+            android:enabled="true"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:process=":pushservice" />
+        <!--注：此 service 必须在小米推送 SDK3.0.1 版本以后（包括 3.0.1 版本）加入-->
+        <service
+            android:enabled="true"
+            android:exported="true"
+            android:name="com.xiaomi.mipush.sdk.PushMessageHandler" />
+        <service android:enabled="true"
+            android:name="com.xiaomi.mipush.sdk.MessageHandleService" />
+        <!--注：此 service 必须在小米推送 SDK2.2.5 版本以后（包括 2.2.5 版本）加入-->
+        <receiver
+            android:exported="true"
+            android:name="com.xiaomi.push.service.receivers.NetworkStatusReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:exported="false"
+            android:process=":pushservice"
+            android:name="com.xiaomi.push.service.receivers.PingReceiver" >
+            <intent-filter>
+                <action android:name="com.xiaomi.push.PING_TIMER" />
+            </intent-filter>
+        </receiver>
+
+
+        <!-- mipush -->
+        <receiver
+            android:exported="true"
+            android:name=".wechat.receiver.MiPushMessageReceiver">
+            <!--这里 com.tencent.imsdk.MiPushMessageReceiver 改成 App 中定义的完整类名-->
+            <intent-filter>
+                <action android:name="com.xiaomi.mipush.RECEIVE_MESSAGE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.xiaomi.mipush.MESSAGE_ARRIVED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.xiaomi.mipush.ERROR" />
+            </intent-filter>
+        </receiver>
+        <!--注：小米推送-->
 
     </application>
 

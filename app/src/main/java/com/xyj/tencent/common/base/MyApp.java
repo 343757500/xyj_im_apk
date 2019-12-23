@@ -3,9 +3,11 @@ package com.xyj.tencent.common.base;
 import android.app.Application;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.util.Log;
 
 
+import com.huawei.android.pushagent.api.PushManager;
 import com.tencent.imsdk.TIMConnListener;
 import com.tencent.imsdk.TIMConversation;
 import com.tencent.imsdk.TIMFriendshipSettings;
@@ -13,6 +15,9 @@ import com.tencent.imsdk.TIMGroupEventListener;
 import com.tencent.imsdk.TIMGroupMemberInfo;
 import com.tencent.imsdk.TIMGroupSettings;
 import com.tencent.imsdk.TIMGroupTipsElem;
+import com.tencent.imsdk.TIMManager;
+import com.tencent.imsdk.TIMOfflinePushListener;
+import com.tencent.imsdk.TIMOfflinePushNotification;
 import com.tencent.imsdk.TIMRefreshListener;
 import com.tencent.imsdk.TIMSNSChangeInfo;
 import com.tencent.imsdk.TIMUserConfig;
@@ -24,10 +29,14 @@ import com.tencent.imsdk.ext.group.TIMUserConfigGroupExt;
 import com.tencent.imsdk.ext.message.TIMUserConfigMsgExt;
 import com.tencent.imsdk.ext.sns.TIMFriendshipProxyListener;
 import com.tencent.imsdk.ext.sns.TIMUserConfigSnsExt;
+import com.tencent.qalsdk.sdk.MsfSdkUtils;
+import com.xiaomi.mipush.sdk.MiPushClient;
+import com.xyj.tencent.R;
 import com.xyj.tencent.wechat.model.bean.LoginFriendGroups;
 import com.xyj.tencent.wechat.model.db.MyDbHelper;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * 应用程序上下文对象，常作一些初始化操作
@@ -48,6 +57,24 @@ public class MyApp extends Application {
 		context = getApplicationContext();
 		initTIMUserConfig();
 		initDb();
+
+
+		//离线推送
+		if(MsfSdkUtils.isMainProcess(this)) {
+			Log.d("MyApplication", "main process");
+
+            registerPush();
+
+			// 设置离线推送监听器
+			TIMManager.getInstance().setOfflinePushListener(new TIMOfflinePushListener() {
+				@Override
+				public void handleNotification(TIMOfflinePushNotification notification) {
+					Log.d("MyApplication", "recv offline push");
+					// 这里的 doNotify 是 ImSDK 内置的通知栏提醒，应用也可以选择自己利用回调参数 notification 来构造自己的通知栏提醒
+					notification.doNotify(getApplicationContext(), R.drawable.ic_launcher);
+				}
+			});
+		}
 	}
 
 	private void initDb() {
@@ -215,4 +242,18 @@ public class MyApp extends Application {
 	public static Context getContext() {
 		return context;
 	}
+
+
+    public void registerPush(){
+        String vendor = Build.MANUFACTURER;
+        if(vendor.toLowerCase(Locale.ENGLISH).contains("xiaomi")) {
+            //注册小米推送服务
+            MiPushClient.registerPush(this, "2882303761517958358", "5661795862358");
+        }else if(vendor.toLowerCase(Locale.ENGLISH).contains("huawei")) {
+            //请求华为推送设备 token
+            PushManager.requestToken(this);
+        }
+
+    }
+
 }

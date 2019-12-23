@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.xyj.tencent.R;
 import com.xyj.tencent.common.base.BaseFragment;
 import com.xyj.tencent.common.util.SharedPreUtil;
+import com.xyj.tencent.wechat.event.OnlineEvent;
 import com.xyj.tencent.wechat.model.bean.LoginFriendGroups;
 import com.xyj.tencent.wechat.model.protocol.IHttpService;
 import com.xyj.tencent.wechat.presenter.MainFragment2Presenter;
@@ -29,6 +30,9 @@ import com.xyj.tencent.wechat.util.PinyinComparator;
 import com.xyj.tencent.wechat.util.PinyinUtils;
 
 import org.apache.commons.lang3.StringUtils;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,6 +57,7 @@ public class MainFragment2 extends BaseFragment {
 
     @Override
     public void initView() {
+        EventBus.getDefault().register(this);
         characterParser = CharacterParser.getInstance();
         pinyinComparator = new PinyinComparator();
         mainFragment2Presenter = new MainFragment2Presenter(this);
@@ -223,4 +228,43 @@ public class MainFragment2 extends BaseFragment {
         mainFragment2Adapter.updateList(filterDateList);
     }
 
+
+    @Subscribe(threadMode = ThreadMode.MAIN,sticky = true)
+    public void onOnlineEvent(OnlineEvent onlineEvent){
+        String ticket = SharedPreUtil.getString(getActivity(), "ticket", null);
+        if (ticket!=null) {
+            mainFragment2Presenter.getConstactData(ticket);
+        }else{
+            Toast.makeText(mActivity, "ticket为null", Toast.LENGTH_SHORT).show();
+        }
+
+        clearEditText.setCursorVisible(false);
+        //根据输入框输入值的改变来过滤搜索
+        clearEditText.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //当输入框里面的值为空，更新为原来的列表，否则为过滤数据列表
+                filterData(s.toString());
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
 }
